@@ -2,12 +2,12 @@
 
 rem -------- arg check
 if not "%1"=="start" if not "%1"=="stop" (
-	echo usage: cmd.ec2.server [start] [stop]
+	echo usage: cmd.ec2.server [start] [stop] option:[ELB name]
 	exit /B
 )
 
 if "%1" equ "" (
-	echo usage: cmd.ec2.server [start] [stop]
+	echo usage: cmd.ec2.server [start] [stop] option:[ELB name]
 	exit /B
 )
 
@@ -22,8 +22,18 @@ if "%1"=="stop" (
 
 rem -------- your EC2 instances display
 echo your EC2 instance(s):
-aws ec2 describe-instances | jq -r ".Reservations[].Instances[] | {State, InstanceId, PublicDnsName, PublicIpAddress}"
-aws ec2 describe-instances | jq -r ".Reservations[].Instances[].InstanceId" > tmp.txt
+
+if "%2" neq "" (
+
+	echo ELB name: %2
+	aws elb describe-instance-health --load-balancer-name "%2" | jq -r ".InstanceStates[]|{InstanceId, State}"
+	aws elb describe-instance-health --load-balancer-name "%2" | jq -r ".InstanceStates[].InstanceId" > tmp.txt
+
+) else (
+
+	aws ec2 describe-instances | jq -r ".Reservations[].Instances[] | {State, InstanceId, PublicDnsName, PublicIpAddress}"
+	aws ec2 describe-instances | jq -r ".Reservations[].Instances[].InstanceId" > tmp.txt
+)
 
 
 rem -------- build pseudo array
