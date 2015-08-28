@@ -1,6 +1,6 @@
 # cmd.ec2.server.bat
 easy aws ec2 start/stop cmd for windows cli.<br />
-usage: cmd.ec2.server [start][stop] (option[ELB name])<br />
+usage: cmd.ec2.server \[start]\[stop] (option[ELB name])<br />
 <br />
 required:<br />
 <br />
