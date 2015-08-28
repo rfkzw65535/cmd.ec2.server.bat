@@ -1,4 +1,9 @@
 @echo off
+setlocal enabledelayedexpansion
+set ERR=nothing to do.
+set TMP=%~dp0tmp.txt
+set i=1
+
 
 rem -------- arg check
 if not "%1"=="start" if not "%1"=="stop" (
@@ -32,16 +37,18 @@ if "%2" neq "" (
 ) else (
 
 	aws ec2 describe-instances | jq -r ".Reservations[].Instances[] | {State, InstanceId, PublicDnsName, PublicIpAddress}"
-	aws ec2 describe-instances | jq -r ".Reservations[].Instances[].InstanceId" > tmp.txt
+	aws ec2 describe-instances | jq -r ".Reservations[].Instances[].InstanceId" > %TMP%
+)
+
+call :sub %TMP%
+goto :eof
+:sub
+if %~z1==0 (
+	exit /B
 )
 
 
 rem -------- build pseudo array
-setlocal enabledelayedexpansion
-set TMP=tmp.txt
-set ERR=nothing to do.
-set i=1
-
 for /f "delims=" %%a in (%TMP%) do (
 	set /a Array_Index=!Array_Index!+1
 	set Array[!Array_Index!]=%%a
